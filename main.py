@@ -3,21 +3,26 @@
 
 import sys
 from PyQt4 import QtGui, QtCore
+from collections import OrderedDict
+from PyQt4.QtCore import QObject, pyqtSlot
 import plugin_adapter
+
+from functools import partial
 
 plugin_dir = "plugins"
 mod_name = "game"
 class_name = "GamePlugin"
 
 class ToolLabel(QtGui.QLabel):
-    clicked = QtCore.pyqtSignal()
-    def __init__(self, text=""):
+    clicked = QtCore.pyqtSignal(int)
+    def __init__(self, index, text=""):
         super().__init__()
+        self.index = index
         self.setAlignment(QtCore.Qt.AlignCenter)
         self.setText(text)
 
     def mousePressEvent(self, QMouseEvent):
-        self.clicked.emit()
+        self.clicked.emit(self.index)
 
     def add_icon(self, icon_path):
         self.setPixmap(QtGui.QPixmap(icon_path))
@@ -39,7 +44,7 @@ class BaseWindow(QtGui.QWidget):
         QtGui.QWidget.__init__(self)
         self.resize(500, 500)
         self.plugins_game_widget = []
-        self.controls = []
+        self.controls = OrderedDict()
 
         self.plugins = plugin_adapter.AdapterPluginsGame(plugin_dir,
                                                          mod_name,
@@ -77,17 +82,19 @@ class BaseWindow(QtGui.QWidget):
             self.stack.addWidget(widget)
 
     def create_tool_buttons(self):
-        for widg in self.plugins_game_widget:
+        for index, widg in enumerate(self.plugins_game_widget):
             icon = widg.tool_icon
+            self.controls[index] = ToolLabel(index, icon)
+            self.controls[index].add_icon(icon)
 
-            tool_buttpn = ToolLabel(icon)
-            tool_buttpn.add_icon(icon)
-            self.tool.add_button(tool_buttpn)
+            self.controls[index].clicked.connect(self.press_game)
+            self.tool.add_button(self.controls[index])
 
 
 
-
+    @pyqtSlot(int)
     def press_game(self, s):
+        print(s, "<<")
         self.stack.setCurrentIndex(s)
 
 

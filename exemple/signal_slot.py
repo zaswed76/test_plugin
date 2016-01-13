@@ -3,6 +3,7 @@
 
 import sys
 from PyQt4 import QtGui, QtCore
+from PyQt4.QtCore import QObject, pyqtSlot
 
 
 class BaseWindow(QtGui.QWidget):
