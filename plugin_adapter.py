@@ -7,47 +7,50 @@ import glob
 from importlib import import_module
 
 
-class GameObject:
-    def __init__(self, obj):
-        self.obj = obj
-
-
-
 class AdapterPluginsGame:
     mod_ext = ".py"
 
     def __init__(self, plugin_dir, mod_name, class_name):
         """
-        :param plugin_dir: путь к пакету с плагинами
-        :param mod_name: имя подключаемого модуля
+        :param plugin_dir: относительный путь к пакету с плагинами
+        :param mod_name: имя подключаемого модуля без расширения
         :param class_name: имя подключаемого класса
         """
         self.class_name = class_name
         self.mod_name = mod_name
         self.plugin_dir = plugin_dir
-        self.objects = []
 
 
-    def plugins_paths(self):
+
+    @property
+    def paths(self):
         mod_list = []
         pkg_list = [p for p in glob.glob(self.plugin_dir + "/*")]
         for p in pkg_list:
             mod_list.extend(glob.glob("".join([p, os.sep, "*", self.mod_name + self.mod_ext])))
         return mod_list
 
-    def create_plugin_object(self, path_list_plug):
+    def plugin_objects(self, path_list_plug):
+
+        """
+        относительные пути к плагинам
+        @:param path_list_plug: list -> str
+        @:rtype: tuple -> PyQt4.QtCore.pyqtWrapperType
+        """
+
+        objects = []
         for p in path_list_plug:
             m = p[:-3].replace(os.sep, ".")
             mod = import_module(m)
-            self.objects.append(getattr(mod, self.class_name))
+            objects.append(getattr(mod, self.class_name))
+        return tuple(objects)
 
 
 
 if __name__ == '__main__':
-    plugin_dir = "plugins"
+    plugin_dir = "testw/plugins"
     mod_name = "game"
     class_name = "GamePlugin"
     adapter = AdapterPluginsGame(plugin_dir, mod_name, class_name)
-    paths_plug = adapter.plugins_paths()
-    adapter.create_plugin_object(paths_plug)
-    print(adapter.objects)
+
+    print(adapter.plugin_objects(adapter.paths))
