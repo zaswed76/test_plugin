@@ -14,6 +14,9 @@ class ErrorIndex(Exception): pass
 class ErrorChange(Exception): pass
 
 
+class ErrorType(Exception): pass
+
+
 _ERROR_CHANGE_MESSAGE = "нельзя изменить атрибут"
 
 
@@ -109,6 +112,9 @@ class AdapterPluginsGame:
             m = p[:-3].replace(os.sep, ".")
             mod = import_module(m)
             obj = getattr(mod, self.class_name)()
+            if not isinstance(obj, WidgetPlugin):
+                raise ErrorType(
+                    "плагин должен быть унаследован от WidgetPlugin")
             objects.append(obj)
         return tuple(objects)
 

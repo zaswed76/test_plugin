@@ -11,7 +11,7 @@ class GamePlugin(plugin.WidgetPlugin):
     def __init__(self, *__args):
         super().__init__()
         self.root_path = os.path.dirname(__file__)
-        self.tool_icon = os.path.join(self.root_path, self.icons,"tool.png")
+        self.tool_icon = os.path.join(self.root_path, "resource/icons","tool.png")
         self.index = 1
 
         self.label = QtGui.QLabel()
