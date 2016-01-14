@@ -4,31 +4,34 @@
 import sys
 import os
 from PyQt4 import QtGui, QtCore
+from libs import plugin
 
 
-class GamePlugin(QtGui.QLabel):
-    _root = os.path.dirname(__file__)
-    resorce = "resource"
-    icons = "resource/icons"
+class GamePlugin(plugin.WidgetPlugin):
     def __init__(self, *__args):
-        super().__init__(*__args)
+        super().__init__()
+        self.root_path = os.path.dirname(__file__)
+        self.tool_icon = os.path.join(self.root_path, self.icons,"tool.png")
+        self.index = 1
+
+        self.label = QtGui.QLabel()
+
         self.name = "plug1"
-        self.setAlignment(QtCore.Qt.AlignCenter)
-        self.setStyleSheet("""
+        self.label.setAlignment(QtCore.Qt.AlignCenter)
+        self.label.setStyleSheet("""
         background-color:white;
         color: darkblue;
         border: 1px solid blue;
         font-size: 28pt;
         """)
         # -------------------------------------------
-        self.setText("Game 1")
+        self.label.setText("Game 1")
         self.box = QtGui.QVBoxLayout(self)
         self.box.setMargin(0)
         self.box.setSpacing(0)
+        self.box.addWidget(self.label)
 
-    @property
-    def tool_icon(self):
-        return os.path.join(self._root, "resource/icons/tool.png")
+
 
 
 if __name__ == '__main__':

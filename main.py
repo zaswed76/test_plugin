@@ -2,12 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from PyQt4 import QtGui, QtCore
-from collections import OrderedDict
-from PyQt4.QtCore import QObject, pyqtSlot
-import plugin_adapter
 
-from functools import partial
+from PyQt4 import QtGui, QtCore
+from PyQt4.QtCore import pyqtSlot
+
+from libs import plugin
 
 plugin_dir = "plugins"
 mod_name = "game"
@@ -44,9 +43,9 @@ class BaseWindow(QtGui.QWidget):
         QtGui.QWidget.__init__(self)
         self.resize(500, 500)
         self.plugins_game_widget = []
-        self.controls = OrderedDict()
+        self.controls = []
 
-        self.plugins = plugin_adapter.AdapterPluginsGame(plugin_dir,
+        self.plugins = plugin.AdapterPluginsGame(plugin_dir,
                                                          mod_name,
                                                          class_name)
         self.tool = Tool()
@@ -75,7 +74,10 @@ class BaseWindow(QtGui.QWidget):
         """
         mod_objects = self.plugins.plugin_objects(self.plugins.paths)
         for game_widget in mod_objects:
-            self.plugins_game_widget.append(game_widget())
+            widget_plugin = game_widget
+            index = widget_plugin.index
+
+            self.plugins_game_widget.insert(index, widget_plugin)
 
     def add_plugin_to_stack(self):
         for widget in self.plugins_game_widget:
@@ -84,7 +86,7 @@ class BaseWindow(QtGui.QWidget):
     def create_tool_buttons(self):
         for index, widg in enumerate(self.plugins_game_widget):
             icon = widg.tool_icon
-            self.controls[index] = ToolLabel(index, icon)
+            self.controls.append(ToolLabel(index, icon))
             self.controls[index].add_icon(icon)
 
             self.controls[index].clicked.connect(self.press_game)

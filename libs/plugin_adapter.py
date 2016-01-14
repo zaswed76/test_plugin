@@ -42,7 +42,8 @@ class AdapterPluginsGame:
         for p in path_list_plug:
             m = p[:-3].replace(os.sep, ".")
             mod = import_module(m)
-            objects.append(getattr(mod, self.class_name))
+            obj = getattr(mod, self.class_name)()
+            objects.append(obj)
         return tuple(objects)
 
 
